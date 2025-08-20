@@ -1,0 +1,1 @@
+ALTER TABLE events ADD COLUMN booked_count INT NOT NULL DEFAULT 0;
