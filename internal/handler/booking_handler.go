@@ -21,7 +21,7 @@ func NewBookingHandler(service *service.BookingService) *BookingHandler {
 	}
 }
 
-func (h *BookingHandler) Book(c echo.Context) error {
+func (h *BookingHandler) Create(c echo.Context) error {
 	var payload models.RequestBooking
 	if err := c.Bind(&payload); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{

@@ -1,0 +1,1 @@
+DROP TYPE IF EXISTS booking_statuses;

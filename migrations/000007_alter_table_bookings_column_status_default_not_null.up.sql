@@ -1,0 +1,5 @@
+ALTER TABLE bookings
+ALTER COLUMN status SET DEFAULT 'pending';
+
+ALTER TABLE bookings
+ALTER COLUMN status SET NOT NULL;

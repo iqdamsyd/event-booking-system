@@ -30,7 +30,7 @@ func SetupRoutes(e *echo.Echo, userHandler *handler.UserHandler, eventHandler *h
 	private.PUT("/events/:id", eventHandler.Update, middleware.RoleMiddleware(admin))
 	private.DELETE("/events/:id", eventHandler.Delete, middleware.RoleMiddleware(admin))
 
-	private.POST("/bookings", bookingHandler.Book, middleware.RoleMiddleware(user))
+	private.POST("/bookings", bookingHandler.Create, middleware.RoleMiddleware(user))
 	private.PUT("/bookings/cancel", bookingHandler.Cancel, middleware.RoleMiddleware(user))
 	private.PUT("/bookings/confirm", bookingHandler.Confirm, middleware.RoleMiddleware(user))
 }

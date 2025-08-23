@@ -1,0 +1,1 @@
+CREATE TYPE booking_statuses AS ENUM ('pending', 'confirmed', 'cancelled');

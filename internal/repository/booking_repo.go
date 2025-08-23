@@ -49,11 +49,11 @@ func (r *BookingRepository) Create(ctx context.Context, booking models.Booking) 
 	exists, _ := tx.Query(ctx, `
 		SELECT id, user_id, event_id, seats, status, created_at, updated_at
 		FROM bookings
-		WHERE event_id = $1 AND seats = $2 AND status != 'canceled'
+		WHERE event_id = $1 AND seats = $2 AND status != 'cancelled'::booking_statuses
 	`, booking.EventID, booking.Seats)
 	defer exists.Close()
 	if exists.Next() {
-		return fmt.Errorf("insert booking: seat is booked")
+		return fmt.Errorf("get booking: seat is booked")
 	}
 
 	_, err = tx.Exec(ctx, `
@@ -89,7 +89,7 @@ func (r *BookingRepository) Cancel(ctx context.Context, id string, eventID strin
 
 	_, err = tx.Exec(ctx, `
 		UPDATE bookings
-		SET status = 'canceled', updated_at = NOW()
+		SET status = 'cancelled'::booking_statuses, updated_at = NOW()
 		WHERE id = $1
 	`, id)
 	if err != nil {
@@ -121,7 +121,7 @@ func (r *BookingRepository) Confirm(ctx context.Context, id string) error {
 
 	_, err = tx.Exec(ctx, `
 		UPDATE bookings
-		SET status = 'confirmed', updated_at = NOW()
+		SET status = 'confirmed'::booking_statuses, updated_at = NOW()
 		WHERE id = $1
 	`, id)
 	if err != nil {
