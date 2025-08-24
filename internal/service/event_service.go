@@ -54,13 +54,13 @@ func (s *EventService) Delete(ctx context.Context, id string) error {
 	return nil
 }
 
-func (s *EventService) List(ctx context.Context) ([]models.Event, error) {
-	events, err := s.repo.List(ctx)
+func (s *EventService) List(ctx context.Context, filter models.RequestFilterEvent) ([]models.Event, *models.Meta, error) {
+	events, meta, err := s.repo.List(ctx, filter)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	return events, nil
+	return events, meta, nil
 }
 
 func (s *EventService) GetByID(ctx context.Context, id string) (*models.Event, error) {

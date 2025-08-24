@@ -22,17 +22,27 @@ func NewEventHandler(service *service.EventService) *EventHandler {
 }
 
 func (h *EventHandler) List(c echo.Context) error {
+	filter := models.NewRequestFilterEvent()
+	if err := c.Bind(&filter); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{
+			"message": "invalid request",
+		})
+	}
+
 	ctx, cancel := context.WithTimeout(c.Request().Context(), 3*time.Second)
 	defer cancel()
 
-	result, err := h.service.List(ctx)
+	result, meta, err := h.service.List(ctx, filter)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{
 			"message": err.Error(),
 		})
 	}
 
-	return c.JSON(http.StatusOK, result)
+	return c.JSON(http.StatusOK, map[string]any{
+		"data": result,
+		"meta": meta,
+	})
 }
 
 func (h *EventHandler) GetByID(c echo.Context) error {
