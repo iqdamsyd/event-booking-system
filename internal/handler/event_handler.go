@@ -67,6 +67,28 @@ func (h *EventHandler) GetByID(c echo.Context) error {
 	return c.JSON(http.StatusOK, result)
 }
 
+func (h *EventHandler) GetOverview(c echo.Context) error {
+	var id uuid.UUID
+	id, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{
+			"message": "invalid request",
+		})
+	}
+
+	ctx, cancel := context.WithTimeout(c.Request().Context(), 3*time.Second)
+	defer cancel()
+
+	result, err := h.service.GetOverview(ctx, id.String())
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{
+			"message": err.Error(),
+		})
+	}
+
+	return c.JSON(http.StatusOK, result)
+}
+
 func (h *EventHandler) Create(c echo.Context) error {
 	var payload models.RequestCreateEvent
 	if err := c.Bind(&payload); err != nil {

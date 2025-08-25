@@ -26,6 +26,7 @@ func SetupRoutes(e *echo.Echo, userHandler *handler.UserHandler, eventHandler *h
 
 	private.GET("/events", eventHandler.List)
 	private.GET("/events/:id", eventHandler.GetByID)
+	private.GET("/events/:id/overview", eventHandler.GetOverview, middleware.RoleMiddleware(admin))
 	private.POST("/events", eventHandler.Create, middleware.RoleMiddleware(admin))
 	private.PUT("/events/:id", eventHandler.Update, middleware.RoleMiddleware(admin))
 	private.DELETE("/events/:id", eventHandler.Delete, middleware.RoleMiddleware(admin))
@@ -33,4 +34,5 @@ func SetupRoutes(e *echo.Echo, userHandler *handler.UserHandler, eventHandler *h
 	private.POST("/bookings", bookingHandler.Create, middleware.RoleMiddleware(user))
 	private.PUT("/bookings/cancel", bookingHandler.Cancel, middleware.RoleMiddleware(user))
 	private.PUT("/bookings/confirm", bookingHandler.Confirm, middleware.RoleMiddleware(user))
+	private.GET("/bookings/my", bookingHandler.List, middleware.RoleMiddleware(user))
 }

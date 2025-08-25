@@ -71,6 +71,15 @@ func NewRequestFilterEvent() RequestFilterEvent {
 	}
 }
 
+type EventOverview struct {
+	Event
+	Count struct {
+		Pending   int `json:"pending"`
+		Confirmed int `json:"confirmed"`
+		Cancelled int `json:"cancelled"`
+	} `json:"count"`
+}
+
 /* Booking */
 type RequestBooking struct {
 	UserID  uuid.UUID
@@ -86,6 +95,23 @@ type RequestCancelBooking struct {
 type RequestConfirmBooking struct {
 	UserID uuid.UUID
 	ID     uuid.UUID `json:"id"`
+}
+
+type MyBooking struct {
+	ID        uuid.UUID `json:"id"`
+	Title     string    `json:"title"`
+	Location  string    `json:"location"`
+	EventDate time.Time `json:"event_date"`
+	Seats     int       `json:"seats"`
+	Status    string    `json:"status"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+}
+
+type CountBookingStatus struct {
+	EventID uuid.UUID `json:"event_id"`
+	Status  string    `json:"status"`
+	Count   int       `json:"count"`
 }
 
 /* Meta */

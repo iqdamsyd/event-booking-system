@@ -18,6 +18,32 @@ func NewBookingRepository(db *pgxpool.Pool) *BookingRepository {
 	}
 }
 
+func (r *BookingRepository) GetAllByUserID(ctx context.Context, userID string) ([]models.MyBooking, error) {
+	query := `
+		SELECT b.id, e.title, e.location, e.event_date, b.seats, b.status, b.created_at, b.updated_at
+		FROM bookings b
+		LEFT JOIN events e on e.id = b.event_id
+		WHERE b.user_id = $1
+	`
+
+	rows, err := r.db.Query(ctx, query, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	var bookings []models.MyBooking
+	for rows.Next() {
+		var booking models.MyBooking
+		if err := rows.Scan(&booking.ID, &booking.Title, &booking.Location, &booking.EventDate, &booking.Seats, &booking.Status, &booking.CreatedAt, &booking.UpdatedAt); err != nil {
+			return nil, err
+		}
+
+		bookings = append(bookings, booking)
+	}
+
+	return bookings, nil
+}
+
 func (r *BookingRepository) GetByID(ctx context.Context, id string) (*models.Booking, error) {
 	rows, err := r.db.Query(ctx, `
 		SELECT id, user_id, event_id, seats, status, created_at, updated_at
@@ -133,4 +159,29 @@ func (r *BookingRepository) Confirm(ctx context.Context, id string) error {
 	}
 
 	return nil
+}
+
+func (r *BookingRepository) CountBookingStatusByEventID(ctx context.Context, eventID string) ([]models.CountBookingStatus, error) {
+	query := `
+		SELECT event_id, status, COUNT(*) AS count
+		FROM bookings
+		GROUP BY event_id, status
+	`
+
+	rows, err := r.db.Query(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+
+	var bookings []models.CountBookingStatus
+	for rows.Next() {
+		var booking models.CountBookingStatus
+		if err := rows.Scan(&booking.EventID, &booking.Status, &booking.Count); err != nil {
+			return nil, err
+		}
+
+		bookings = append(bookings, booking)
+	}
+
+	return bookings, nil
 }

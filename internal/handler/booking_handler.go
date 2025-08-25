@@ -89,3 +89,25 @@ func (h *BookingHandler) Confirm(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, "")
 }
+
+func (h *BookingHandler) List(c echo.Context) error {
+	ctx, cancel := context.WithTimeout(c.Request().Context(), 3*time.Second)
+	defer cancel()
+
+	claims := c.Get("user").(*domain.UserClaims)
+	userID := claims.ID
+
+	result, err := h.service.ListByUserID(ctx, userID)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{
+			"message": err.Error(),
+		})
+	}
+
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"success": true,
+		"code":    http.StatusOK,
+		"message": "Get my booking list",
+		"data":    result,
+	})
+}

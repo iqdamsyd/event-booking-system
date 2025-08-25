@@ -26,13 +26,13 @@ func NewUserService(repo *repository.UserRepository) *UserService {
 	}
 }
 
-func (us *UserService) Create(ctx context.Context, payload *models.RequestCreateUser) error {
+func (s *UserService) Create(ctx context.Context, payload *models.RequestCreateUser) error {
 	var user models.User
 	user.Name = payload.Name
 	user.Email = payload.Email
 	user.Password = payload.Password
 
-	err := us.repo.Create(ctx, &user)
+	err := s.repo.Create(ctx, &user)
 	if err != nil {
 		return err
 	}
@@ -40,8 +40,8 @@ func (us *UserService) Create(ctx context.Context, payload *models.RequestCreate
 	return nil
 }
 
-func (us *UserService) List(ctx context.Context) ([]models.User, error) {
-	users, err := us.repo.List(ctx)
+func (s *UserService) List(ctx context.Context) ([]models.User, error) {
+	users, err := s.repo.List(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -49,8 +49,8 @@ func (us *UserService) List(ctx context.Context) ([]models.User, error) {
 	return users, nil
 }
 
-func (us *UserService) GetByID(ctx context.Context, id string) (*models.User, error) {
-	user, err := us.repo.FindByID(ctx, id)
+func (s *UserService) GetByID(ctx context.Context, id string) (*models.User, error) {
+	user, err := s.repo.FindByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -58,29 +58,29 @@ func (us *UserService) GetByID(ctx context.Context, id string) (*models.User, er
 	return user, nil
 }
 
-func (us *UserService) Update(ctx context.Context, user *models.RequestUpdateUser) error {
-	if err := us.repo.Update(ctx, user); err != nil {
+func (s *UserService) Update(ctx context.Context, user *models.RequestUpdateUser) error {
+	if err := s.repo.Update(ctx, user); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (us *UserService) Delete(ctx context.Context, id string) error {
-	if err := us.repo.Delete(ctx, id); err != nil {
+func (s *UserService) Delete(ctx context.Context, id string) error {
+	if err := s.repo.Delete(ctx, id); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (us *UserService) Register(ctx context.Context, payload models.RequestRegisterUser) error {
+func (s *UserService) Register(ctx context.Context, payload models.RequestRegisterUser) error {
 	var user models.User
 	user.Name = payload.Name
 	user.Email = payload.Email
 	user.Password = payload.Password
 
-	err := us.repo.Create(ctx, &user)
+	err := s.repo.Create(ctx, &user)
 	if err != nil {
 		return err
 	}
@@ -88,11 +88,11 @@ func (us *UserService) Register(ctx context.Context, payload models.RequestRegis
 	return nil
 }
 
-func (us *UserService) Login(ctx context.Context, payload models.RequestLoginUser) (string, error) {
+func (s *UserService) Login(ctx context.Context, payload models.RequestLoginUser) (string, error) {
 	email := payload.Email
 	password := payload.Password
 
-	user, err := us.repo.FindByEmail(ctx, email)
+	user, err := s.repo.FindByEmail(ctx, email)
 	if err != nil {
 		return "", errors.New("User not found")
 	}

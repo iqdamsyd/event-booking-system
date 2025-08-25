@@ -27,13 +27,15 @@ func main() {
 	fmt.Print(greeting)
 
 	userRepo := repository.NewUserRepository(db)
-	userService := service.NewUserService(userRepo)
-	userHandler := handler.NewUserHandler(userService)
 	eventRepo := repository.NewEventRepository(db)
-	eventService := service.NewEventService(eventRepo)
-	eventHandler := handler.NewEventHandler(eventService)
 	bookingRepo := repository.NewBookingRepository(db)
+
+	userService := service.NewUserService(userRepo)
+	eventService := service.NewEventService(eventRepo, bookingRepo)
 	bookingService := service.NewBookingService(bookingRepo, eventRepo)
+
+	userHandler := handler.NewUserHandler(userService)
+	eventHandler := handler.NewEventHandler(eventService)
 	bookingHandler := handler.NewBookingHandler(bookingService)
 
 	e := echo.New()

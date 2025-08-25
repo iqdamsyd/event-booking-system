@@ -6,11 +6,13 @@ import (
 	"event-booking-system/internal/models"
 	"event-booking-system/internal/repository"
 	"fmt"
+
+	"github.com/google/uuid"
 )
 
 const (
 	PENDING   = "pending"
-	CANCELED  = "canceled"
+	CANCELLED = "cancelled"
 	CONFIRMED = "confirmed"
 )
 
@@ -87,4 +89,13 @@ func (s *BookingService) Confim(ctx context.Context, payload models.RequestConfi
 	}
 
 	return nil
+}
+
+func (s *BookingService) ListByUserID(ctx context.Context, userID uuid.UUID) ([]models.MyBooking, error) {
+	bookings, err := s.repo.GetAllByUserID(ctx, userID.String())
+	if err != nil {
+		return nil, err
+	}
+
+	return bookings, nil
 }
