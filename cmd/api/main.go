@@ -2,7 +2,8 @@ package main
 
 import (
 	"context"
-	"event-booking-system/internal/db"
+	"event-booking-system/internal/databases/postgres"
+	"event-booking-system/internal/databases/redis"
 	"event-booking-system/internal/handler"
 	"event-booking-system/internal/repository"
 	"event-booking-system/internal/router"
@@ -15,7 +16,7 @@ import (
 )
 
 func main() {
-	db, err := db.NewDB()
+	db, err := postgres.NewDB()
 	if err != nil {
 		panic(err)
 	}
@@ -24,7 +25,21 @@ func main() {
 	if err = db.QueryRow(context.Background(), "SELECT 'Hello, DB!'").Scan(&greeting); err != nil {
 		fmt.Printf("QueryRow failed: %v\n", err)
 	}
-	fmt.Print(greeting)
+	fmt.Println(greeting)
+
+	cache, err := redis.NewRedis()
+	if err != nil {
+		panic(err)
+	}
+
+	if err = cache.Set(context.Background(), "foo", "bar", 0).Err(); err != nil {
+		fmt.Printf("Cache SET failed: %v\n", err)
+	}
+	val, err := cache.Get(context.Background(), "foo").Result()
+	if err != nil {
+		fmt.Printf("Cache GET failed: %v\n", err)
+	}
+	fmt.Println("foo", val)
 
 	userRepo := repository.NewUserRepository(db)
 	eventRepo := repository.NewEventRepository(db)
