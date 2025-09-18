@@ -7,22 +7,27 @@ import (
 	"event-booking-system/internal/domain"
 	"event-booking-system/internal/models"
 	"event-booking-system/internal/repository"
+	"fmt"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/redis/go-redis/v9"
 )
 
 var (
 	jwtSecret = config.GetConfig().JWTSecret
+	jwtExp    = 3 * time.Hour
 )
 
 type UserService struct {
-	repo *repository.UserRepository
+	repo  *repository.UserRepository
+	cache *redis.Client
 }
 
-func NewUserService(repo *repository.UserRepository) *UserService {
+func NewUserService(repo *repository.UserRepository, cache *redis.Client) *UserService {
 	return &UserService{
-		repo: repo,
+		repo:  repo,
+		cache: cache,
 	}
 }
 
@@ -71,6 +76,9 @@ func (s *UserService) Delete(ctx context.Context, id string) error {
 		return err
 	}
 
+	// Save user ID to redis denylist
+	s.cache.Set(ctx, fmt.Sprintf("denylist:%s", id), id, jwtExp)
+
 	return nil
 }
 
@@ -102,10 +110,10 @@ func (s *UserService) Login(ctx context.Context, payload models.RequestLoginUser
 	}
 
 	claims := domain.UserClaims{
-		ID:   user.ID,
 		Role: user.Role,
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 24)),
+			Subject:   user.ID.String(),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(jwtExp)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 		},
 	}

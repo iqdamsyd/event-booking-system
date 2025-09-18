@@ -5,6 +5,7 @@ import (
 	"event-booking-system/internal/middleware"
 
 	"github.com/labstack/echo/v4"
+	"github.com/redis/go-redis/v9"
 )
 
 var (
@@ -12,8 +13,8 @@ var (
 	user  = "user"
 )
 
-func SetupRoutes(e *echo.Echo, userHandler *handler.UserHandler, eventHandler *handler.EventHandler, bookingHandler *handler.BookingHandler) {
-	private := e.Group("/api", middleware.JWTMiddleware)
+func SetupRoutes(e *echo.Echo, cache *redis.Client, userHandler *handler.UserHandler, eventHandler *handler.EventHandler, bookingHandler *handler.BookingHandler) {
+	private := e.Group("/api", middleware.JWTMiddleware(cache))
 
 	e.POST("/users/register", userHandler.Register)
 	e.POST("/users/login", userHandler.Login)

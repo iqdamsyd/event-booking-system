@@ -46,7 +46,7 @@ func main() {
 	eventRepo := repository.NewEventRepository(db)
 	bookingRepo := repository.NewBookingRepository(db)
 
-	userService := service.NewUserService(userRepo)
+	userService := service.NewUserService(userRepo, cache)
 	eventService := service.NewEventService(eventRepo, bookingRepo)
 	bookingService := service.NewBookingService(bookingRepo, eventRepo)
 
@@ -64,7 +64,7 @@ func main() {
 		return c.String(http.StatusOK, "Hello, world!")
 	})
 
-	router.SetupRoutes(e, userHandler, eventHandler, bookingHandler)
+	router.SetupRoutes(e, cache, userHandler, eventHandler, bookingHandler)
 
 	e.Logger.Fatal(e.Start(":8079"))
 }

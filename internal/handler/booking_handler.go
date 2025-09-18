@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 )
 
@@ -30,7 +31,7 @@ func (h *BookingHandler) Create(c echo.Context) error {
 	}
 
 	claims := c.Get("user").(*domain.UserClaims)
-	payload.UserID = claims.ID
+	payload.UserID = uuid.MustParse(claims.Subject)
 
 	ctx, cancel := context.WithTimeout(c.Request().Context(), 1*time.Second)
 	defer cancel()
@@ -53,7 +54,7 @@ func (h *BookingHandler) Cancel(c echo.Context) error {
 	}
 
 	claims := c.Get("user").(*domain.UserClaims)
-	payload.UserID = claims.ID
+	payload.UserID = uuid.MustParse(claims.Subject)
 
 	ctx, cancel := context.WithTimeout(c.Request().Context(), 1*time.Second)
 	defer cancel()
@@ -76,7 +77,7 @@ func (h *BookingHandler) Confirm(c echo.Context) error {
 	}
 
 	claims := c.Get("user").(*domain.UserClaims)
-	payload.UserID = claims.ID
+	payload.UserID = uuid.MustParse(claims.Subject)
 
 	ctx, cancel := context.WithTimeout(c.Request().Context(), 1*time.Second)
 	defer cancel()
@@ -95,7 +96,7 @@ func (h *BookingHandler) List(c echo.Context) error {
 	defer cancel()
 
 	claims := c.Get("user").(*domain.UserClaims)
-	userID := claims.ID
+	userID := uuid.MustParse(claims.Subject)
 
 	result, err := h.service.ListByUserID(ctx, userID)
 	if err != nil {
