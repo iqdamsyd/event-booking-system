@@ -5,6 +5,7 @@ import (
 	"event-booking-system/internal/databases/postgres"
 	"event-booking-system/internal/databases/redis"
 	"event-booking-system/internal/handler"
+	middlewares "event-booking-system/internal/middleware"
 	"event-booking-system/internal/repository"
 	"event-booking-system/internal/router"
 	"event-booking-system/internal/service"
@@ -57,7 +58,7 @@ func main() {
 
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
-	e.Use()
+	e.Use(middlewares.RateLimiterMiddleware(cache))
 
 	e.GET("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Hello, world!")
